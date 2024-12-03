@@ -100,7 +100,7 @@ This MCP server requires database access to function. For security:
 4. **Enable logging** for audit purposes
 5. **Regular security reviews** of database access
 
-See [MySQL Security Configuration Guide](SECURITY.md) for detailed instructions on:
+See [MySQL Security Configuration Guide](https://github.com/designcomputer/mysql_mcp_server/blob/main/SECURITY.md) for detailed instructions on:
 - Creating a restricted MySQL user
 - Setting appropriate permissions
 - Monitoring database access
