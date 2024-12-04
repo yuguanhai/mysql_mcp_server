@@ -1,3 +1,4 @@
+# .github/workflows/test.yml
 name: Tests
 
 on:
@@ -9,6 +10,18 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    
+    # Add MySQL service
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: testpassword
+          MYSQL_DATABASE: test_db
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     strategy:
       matrix:
         python-version: ["3.11", "3.12"]
@@ -29,5 +42,10 @@ jobs:
         uv pip install -r requirements-dev.txt
         
     - name: Run tests
+      env:
+        MYSQL_HOST: 127.0.0.1
+        MYSQL_USER: root
+        MYSQL_PASSWORD: testpassword
+        MYSQL_DATABASE: test_db
       run: |
-        pytest
+        pytest -v
