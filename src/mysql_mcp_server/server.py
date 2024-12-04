@@ -13,21 +13,21 @@ logging.basicConfig(
 )
 logger = logging.getLogger("mysql_mcp_server")
 
-# Get database configuration from environment variables
-DB_CONFIG = {
-    "host": os.getenv("MYSQL_HOST", "localhost"),
-    "user": os.getenv("MYSQL_USER"),
-    "password": os.getenv("MYSQL_PASSWORD"),
-    "database": os.getenv("MYSQL_DATABASE")
-}
-
-# Validate configuration
-if not all([DB_CONFIG["user"], DB_CONFIG["password"], DB_CONFIG["database"]]):
-    logger.error("Missing required database configuration. Please check environment variables:")
-    logger.error("MYSQL_USER, MYSQL_PASSWORD, and MYSQL_DATABASE are required")
-    raise ValueError("Missing required database configuration")
-
-logger.info(f"Connecting to database {DB_CONFIG['database']} on {DB_CONFIG['host']}")
+def get_db_config():
+    """Get database configuration from environment variables."""
+    config = {
+        "host": os.getenv("MYSQL_HOST", "localhost"),
+        "user": os.getenv("MYSQL_USER"),
+        "password": os.getenv("MYSQL_PASSWORD"),
+        "database": os.getenv("MYSQL_DATABASE")
+    }
+    
+    if not all([config["user"], config["password"], config["database"]]):
+        logger.error("Missing required database configuration. Please check environment variables:")
+        logger.error("MYSQL_USER, MYSQL_PASSWORD, and MYSQL_DATABASE are required")
+        raise ValueError("Missing required database configuration")
+    
+    return config
 
 # Initialize server
 app = Server("mysql_mcp_server")
@@ -35,8 +35,9 @@ app = Server("mysql_mcp_server")
 @app.list_resources()
 async def list_resources() -> list[Resource]:
     """List MySQL tables as resources."""
+    config = get_db_config()
     try:
-        with connect(**DB_CONFIG) as conn:
+        with connect(**config) as conn:
             with conn.cursor() as cursor:
                 cursor.execute("SHOW TABLES")
                 tables = cursor.fetchall()
@@ -60,6 +61,7 @@ async def list_resources() -> list[Resource]:
 @app.read_resource()
 async def read_resource(uri: AnyUrl) -> str:
     """Read table contents."""
+    config = get_db_config()
     uri_str = str(uri)
     logger.info(f"Reading resource: {uri_str}")
     
@@ -70,7 +72,7 @@ async def read_resource(uri: AnyUrl) -> str:
     table = parts[0]
     
     try:
-        with connect(**DB_CONFIG) as conn:
+        with connect(**config) as conn:
             with conn.cursor() as cursor:
                 cursor.execute(f"SELECT * FROM {table} LIMIT 100")
                 columns = [desc[0] for desc in cursor.description]
@@ -106,6 +108,7 @@ async def list_tools() -> list[Tool]:
 @app.call_tool()
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     """Execute SQL commands."""
+    config = get_db_config()
     logger.info(f"Calling tool: {name} with arguments: {arguments}")
     
     if name != "execute_sql":
@@ -116,14 +119,14 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         raise ValueError("Query is required")
     
     try:
-        with connect(**DB_CONFIG) as conn:
+        with connect(**config) as conn:
             with conn.cursor() as cursor:
                 cursor.execute(query)
                 
                 # Special handling for SHOW TABLES
                 if query.strip().upper().startswith("SHOW TABLES"):
                     tables = cursor.fetchall()
-                    result = ["Tables_in_" + DB_CONFIG["database"]]  # Header
+                    result = ["Tables_in_" + config["database"]]  # Header
                     result.extend([table[0] for table in tables])
                     return [TextContent(type="text", text="\n".join(result))]
                 
@@ -148,7 +151,8 @@ async def main():
     from mcp.server.stdio import stdio_server
     
     logger.info("Starting MySQL MCP server...")
-    logger.info(f"Database config: {DB_CONFIG['host']}/{DB_CONFIG['database']} as {DB_CONFIG['user']}")
+    config = get_db_config()
+    logger.info(f"Database config: {config['host']}/{config['database']} as {config['user']}")
     
     async with stdio_server() as (read_stream, write_stream):
         try:
@@ -163,4 +167,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-    
