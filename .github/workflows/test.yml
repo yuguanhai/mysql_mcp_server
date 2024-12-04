@@ -38,17 +38,19 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
-        # Debug information
-        echo "Current directory:"
-        pwd
-        echo "Directory contents:"
-        ls -R
-        # Install package in development mode
         pip install -e .
-        # Verify installation
-        pip list | grep mysql-mcp-server
-        python -c "import mysql_mcp_server; print(mysql_mcp_server.__file__)"
         
+    - name: Verify installation
+      run: |
+        # Show Python path
+        python -c "import sys; print('\n'.join(sys.path))"
+        # Try importing the module
+        python -c "import mysql_mcp_server; print('Module found at:', mysql_mcp_server.__file__)"
+        # List installed packages
+        pip list | grep mysql
+        # Show the content of site-packages
+        ls -R $(python -c "import site; print(site.getsitepackages()[0])")
+
     - name: Run tests
       env:
         MYSQL_HOST: 127.0.0.1
