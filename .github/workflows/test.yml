@@ -38,7 +38,16 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
-        pip install pytest pytest-asyncio
+        # Debug information
+        echo "Current directory:"
+        pwd
+        echo "Directory contents:"
+        ls -R
+        # Install package in development mode
+        pip install -e .
+        # Verify installation
+        pip list | grep mysql-mcp-server
+        python -c "import mysql_mcp_server; print(mysql_mcp_server.__file__)"
         
     - name: Run tests
       env:
