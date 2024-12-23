@@ -1,4 +1,5 @@
 ![Tests](https://github.com/designcomputer/mysql_mcp_server/actions/workflows/test.yml/badge.svg)
+[![smithery badge](https://smithery.ai/badge/mysql-mcp-server)](https://smithery.ai/server/mysql-mcp-server)
 # MySQL MCP Server
 
 A Model Context Protocol (MCP) server that enables secure interaction with MySQL databases. This server allows AI assistants to list tables, read data, and execute SQL queries through a controlled interface, making database exploration and analysis safer and more structured.
@@ -13,6 +14,15 @@ A Model Context Protocol (MCP) server that enables secure interaction with MySQL
 
 ## Installation
 
+### Installing via Smithery
+
+To install MySQL Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/mysql-mcp-server):
+
+```bash
+npx -y @smithery/cli install mysql-mcp-server --client claude
+```
+
+### Manual Installation
 ```bash
 pip install mysql-mcp-server
 ```
@@ -120,4 +130,3 @@ MIT License - see LICENSE file for details.
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
-
