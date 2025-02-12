@@ -22,7 +22,8 @@ pip install mysql-mcp-server
 Set the following environment variables:
 
 ```bash
-MYSQL_HOST=localhost
+MYSQL_HOST=localhost     # Database host
+MYSQL_PORT=3306         # Optional: Database port (defaults to 3306 if not specified)
 MYSQL_USER=your_username
 MYSQL_PASSWORD=your_password
 MYSQL_DATABASE=your_database
@@ -47,6 +48,7 @@ Add this to your `claude_desktop_config.json`:
       ],
       "env": {
         "MYSQL_HOST": "localhost",
+        "MYSQL_PORT": "3306",
         "MYSQL_USER": "your_username",
         "MYSQL_PASSWORD": "your_password",
         "MYSQL_DATABASE": "your_database"
