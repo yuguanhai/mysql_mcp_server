@@ -14,17 +14,17 @@ A Model Context Protocol (MCP) server that enables secure interaction with MySQL
 
 ## Installation
 
+### Manual Installation
+```bash
+pip install mysql-mcp-server
+```
+
 ### Installing via Smithery
 
 To install MySQL Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/mysql-mcp-server):
 
 ```bash
 npx -y @smithery/cli install mysql-mcp-server --client claude
-```
-
-### Manual Installation
-```bash
-pip install mysql-mcp-server
 ```
 
 ## Configuration
