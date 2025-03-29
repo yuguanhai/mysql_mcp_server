@@ -15,7 +15,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/ /app/src
 
 # Set environment variables for MySQL (these can be overwritten with `docker run -e`)
-ENV MYSQL_HOST=localhost
+ENV MYSQL_HOST=host.docker.internal
+ENV MYSQL_PORT=3306
 ENV MYSQL_USER=your_username
 ENV MYSQL_PASSWORD=your_password
 ENV MYSQL_DATABASE=your_database
