@@ -14,6 +14,10 @@ startCommand:
       mysqlHost:
         type: string
         description: The hostname of the MySQL server.
+      mysqlPort:
+        type: number
+        description: The port of the MySQL server (default: 3306).
+        default: 3306
       mysqlUser:
         type: string
         description: The username for MySQL authentication.
@@ -26,4 +30,17 @@ startCommand:
   commandFunction:
     # A function that produces the CLI command to start the MCP on stdio.
     |-
-    (config) => ({ command: 'python', args: ['-m', 'mysql_mcp_server'], env: { MYSQL_HOST: config.mysqlHost, MYSQL_USER: config.mysqlUser, MYSQL_PASSWORD: config.mysqlPassword, MYSQL_DATABASE: config.mysqlDatabase } })
+    (config) => ({ 
+      command: 'docker', 
+      args: [
+        'run',
+        '-i',
+        '--rm',
+        '-e', `MYSQL_HOST=${config.mysqlHost}`,
+        '-e', `MYSQL_PORT=${config.mysqlPort}`,
+        '-e', `MYSQL_USER=${config.mysqlUser}`,
+        '-e', `MYSQL_PASSWORD=${config.mysqlPassword}`,
+        '-e', `MYSQL_DATABASE=${config.mysqlDatabase}`,
+        'smithery/mysql-mcp-server:latest'
+      ]
+    })
