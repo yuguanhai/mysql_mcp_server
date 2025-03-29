@@ -19,6 +19,7 @@ ENV MYSQL_HOST=localhost
 ENV MYSQL_USER=your_username
 ENV MYSQL_PASSWORD=your_password
 ENV MYSQL_DATABASE=your_database
+ENV PYTHONPATH=/app/src
 
 # Command to run the server
-CMD ["python", "-m", "mysql_mcp_server"]
+CMD ["python", "-m", "mysql_mcp_server.server"]
