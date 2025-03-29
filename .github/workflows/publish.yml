@@ -20,26 +20,31 @@ jobs:
         python -m pip install --upgrade pip
         pip install build
     
-    - name: Clean previous builds
+    - name: Debug environment
+      run: |
+        echo "==== Current directory contents ===="
+        ls -la
+        echo "==== pyproject.toml content ===="
+        cat pyproject.toml
+        echo "==== Git information ===="
+        git describe --tags || echo "No tags found"
+        git rev-parse HEAD
+    
+    - name: Clean and force version
       run: |
         rm -rf dist/ build/ *.egg-info/
+        # Force the version directly before building
+        sed -i 's/version = "0.[0-9].[0-9]"/version = "0.2.0"/g' pyproject.toml
+        echo "==== Modified pyproject.toml ===="
+        cat pyproject.toml
+        
+        # Also check for any version in Python files
+        find . -name "__init__.py" -type f -exec grep -l "__version__" {} \; | xargs -I{} sed -i 's/__version__ = "0.[0-9].[0-9]"/__version__ = "0.2.0"/g' {}
     
-    - name: Force set version to 0.1.3
+    - name: Build package with verbose output
       run: |
-        # Update version in pyproject.toml
-        sed -i 's/version = "0.1.2"/version = "0.1.3"/g' pyproject.toml
-        # Also update any __version__ in Python files
-        find . -name "*.py" -type f -exec sed -i 's/__version__ = "0.1.2"/__version__ = "0.1.3"/g' {} \;
-        # Show the changes
-        echo "Updated pyproject.toml version:"
-        grep "version" pyproject.toml
-    
-    - name: Build package
-      run: python -m build
-    
-    - name: Debug package files
-      run: |
-        echo "Built distribution files:"
+        python -m build --verbose
+        echo "==== Built package contents ===="
         ls -la dist/
     
     - name: Publish to PyPI
