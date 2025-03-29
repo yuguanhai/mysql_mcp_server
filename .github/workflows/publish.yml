@@ -3,11 +3,6 @@ on:
   release:
     types: [published]
 
-# Add these permissions for trusted publishing
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -56,5 +51,5 @@ jobs:
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        attestations: true
+        password: ${{ secrets.PYPI_API_TOKEN }}
         skip-existing: true
