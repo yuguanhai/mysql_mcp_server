@@ -22,3 +22,4 @@ uv.lock
 # Distribution directories
 *.dist-info/
 
+pypi_publishing_notes.md
