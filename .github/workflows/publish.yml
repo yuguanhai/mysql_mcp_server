@@ -12,16 +12,35 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.12'
+        cache: 'pip'
+        cache-dependency-path: '.github/workflows/publish.yml'
     
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install build
-        
+    
+    - name: Clean previous builds
+      run: |
+        rm -rf dist/ build/ *.egg-info/
+    
+    - name: Verify version before build
+      run: |
+        echo "==== pyproject.toml version ===="
+        grep "version" pyproject.toml
+    
     - name: Build package
       run: python -m build
-      
+    
+    - name: Debug package version
+      run: |
+        echo "==== Built distribution files ===="
+        ls -la dist/
+        echo "==== Checking tarball contents ===="
+        tar -tzf dist/*.tar.gz | grep -E 'version|VERSION'
+    
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        attestations: true        
+        attestations: true
+        skip-existing: true
