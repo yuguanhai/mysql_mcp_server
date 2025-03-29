@@ -5,9 +5,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
     steps:
     - uses: actions/checkout@v4
     
@@ -27,6 +24,5 @@ jobs:
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        attestations: true
-        # Remove or comment out the password line if it exists
-        # password: ${{ secrets.PYPI_API_TOKEN }}
+        password: ${{ secrets.PYPI_API_TOKEN }}
+        # Remove attestations line if it exists
