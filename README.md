@@ -60,6 +60,31 @@ Add this to your `claude_desktop_config.json`:
 }
 ```
 
+### With Visual Studio Code
+Add this to your `mcp.json`:
+```json
+{
+  "servers": {
+      "mysql": {
+            "type": "stdio",
+            "command": "uvx",
+            "args": [
+                "--from",
+                "mysql-mcp-server",
+                "mysql_mcp_server"
+            ],
+      "env": {
+        "MYSQL_HOST": "localhost",
+        "MYSQL_PORT": "3306",
+        "MYSQL_USER": "your_username",
+        "MYSQL_PASSWORD": "your_password",
+        "MYSQL_DATABASE": "your_database"
+      }
+  }
+}
+```
+Note: Will need to install uv for this to work
+
 ### Debugging with MCP Inspector
 While MySQL MCP Server isn't intended to be run standalone or directly from the command line with Python, you can use the MCP Inspector to debug it.
 
