@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import sys
 from mysql.connector import connect, Error
 from mcp.server import Server
 from mcp.types import Resource, Tool, TextContent
@@ -131,12 +132,16 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                     result.extend([table[0] for table in tables])
                     return [TextContent(type="text", text="\n".join(result))]
                 
-                # Regular SELECT queries
-                elif query.strip().upper().startswith("SELECT"):
+                # Handle all other queries that return result sets (SELECT, SHOW, DESCRIBE etc.)
+                elif cursor.description is not None:
                     columns = [desc[0] for desc in cursor.description]
-                    rows = cursor.fetchall()
-                    result = [",".join(map(str, row)) for row in rows]
-                    return [TextContent(type="text", text="\n".join([",".join(columns)] + result))]
+                    try:
+                        rows = cursor.fetchall()
+                        result = [",".join(map(str, row)) for row in rows]
+                        return [TextContent(type="text", text="\n".join([",".join(columns)] + result))]
+                    except Error as e:
+                        logger.warning(f"Error fetching results: {str(e)}")
+                        return [TextContent(type="text", text=f"Query executed but error fetching results: {str(e)}")]
                 
                 # Non-SELECT queries
                 else:
@@ -151,8 +156,15 @@ async def main():
     """Main entry point to run the MCP server."""
     from mcp.server.stdio import stdio_server
     
-    logger.info("Starting MySQL MCP server...")
+    # Add additional debug output
+    print("Starting MySQL MCP server with config:", file=sys.stderr)
     config = get_db_config()
+    print(f"Host: {config['host']}", file=sys.stderr)
+    print(f"Port: {config['port']}", file=sys.stderr)
+    print(f"User: {config['user']}", file=sys.stderr)
+    print(f"Database: {config['database']}", file=sys.stderr)
+    
+    logger.info("Starting MySQL MCP server...")
     logger.info(f"Database config: {config['host']}/{config['database']} as {config['user']}")
     
     async with stdio_server() as (read_stream, write_stream):
