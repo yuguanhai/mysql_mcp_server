@@ -53,9 +53,9 @@ jobs:
 
     - name: Run tests
       env:
-        MYSQL_HOST: 127.0.0.1
+        MYSQL_HOST: localhost
         MYSQL_USER: root
-        MYSQL_PASSWORD: testpassword
-        MYSQL_DATABASE: test_db
+        MYSQL_PASSWORD: 12345678
+        MYSQL_DATABASE: qi
       run: |
         python -m pytest -v
