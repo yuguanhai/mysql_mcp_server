@@ -104,6 +104,20 @@ async def list_tools() -> list[Tool]:
                 },
                 "required": ["query"]
             }
+        ),
+        Tool(
+            name="insert_all",
+            description="Insert all data",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "The SQL query to execute"
+                    }
+                },
+                "required": ["query"]
+            }
         )
     ]
 
@@ -113,13 +127,26 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     config = get_db_config()
     logger.info(f"Calling tool: {name} with arguments: {arguments}")
     
-    if name != "execute_sql":
+    if name not in ["execute_sql", "insert_all"]:
         raise ValueError(f"Unknown tool: {name}")
     
     query = arguments.get("query")
     if not query:
         raise ValueError("Query is required")
-    
+
+    if name == "insert_all":
+        try:
+            with connect(**config) as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(query)
+                    query = query.replace("INSERT INTO", "INSERT IGNORE INTO")
+                    cursor.execute(query)
+                    conn.commit()
+                    return [TextContent(type="text", text=f"Insert_all executed successfully. Rows affected: {cursor.rowcount}")]
+        except Error as e:
+            logger.error(f"Error executing SQL '{query}': {e}")
+            return [TextContent(type="text", text=f"Error executing insertion: {str(e)}")]
+
     try:
         with connect(**config) as conn:
             with conn.cursor() as cursor:
